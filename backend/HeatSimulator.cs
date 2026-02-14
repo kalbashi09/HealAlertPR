@@ -33,11 +33,11 @@ namespace HeatAlert
 
         public string GetDangerLevel(int heatIndex)
         {
-            if (heatIndex >= 52) return "🚨 EXTREME DANGER";
+            if (heatIndex >= 49) return "🚨 EXTREME DANGER";
             if (heatIndex >= 42) return "🔥 DANGER";
-            if (heatIndex >= 39) return "⚠️ EXTREME CAUTION"; // 33 to 41
-            if (heatIndex >= 28) return "✅ NORMAL";          // 28 to 32
-            return "❄️ COOL";                                 // Anything below 28
+            if (heatIndex >= 39) return "⚠️ EXTREME CAUTION"; 
+            if (heatIndex >= 30) return "✅ NORMAL";          
+            return "❄️ COOL";                                 // Anything below 30
         }
 
         public AlertResult GenerateAlert(string jsonPath)
@@ -58,7 +58,11 @@ namespace HeatAlert
             var geometry = selectedFeature["geometry"];
             var coords = geometry?["coordinates"]?[0];
 
-            if (coords == null) return null; // Safety check to stop warnings
+            if (coords == null) 
+                {
+                    // Instead of returning null, return a 'Safe' dummy to avoid crashes
+                    return new AlertResult { BarangayName = "Error", HeatIndex = 0 }; 
+                } // Safety check to stop warnings
 
             // 4. Extract and flatten the coordinates into a list we can measure
             // This tells LINQ to look at each pair [lng, lat] and pull out the 0 index for Lng and 1 for Lat
@@ -78,7 +82,7 @@ namespace HeatAlert
             // 5. Generate random Lat/Lng within that specific box
             double randomLat = rng.NextDouble() * (maxLat - minLat) + minLat;
             double randomLng = rng.NextDouble() * (maxLng - minLng) + minLng;
-            int randomHeat = rng.Next(24, 55); // Generate a dangerous temp
+            int randomHeat = rng.Next(27, 51); // Generate a dangerous temp
 
             string direction = GetRelativeDirection(centerLat, centerLng, randomLat, randomLng);
 

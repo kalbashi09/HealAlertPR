@@ -31,7 +31,7 @@ while (true)
         // 4. Save to DB for the Team's Map
         // NO DB FOR THE MAP, just log the alert for now (or you can implement a method to save it if needed)
     }
-    else if (alert.HeatIndex < 28) // Also log cool/normal temps for transparency, but no broadcast
+    else if (alert.HeatIndex < 30) // Also log cool/normal temps for transparency, but no broadcast
     {
         // 1. Build the human-readable message with directions and coordinates
 
