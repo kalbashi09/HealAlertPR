@@ -69,7 +69,7 @@ _ = Task.Run(async () => {
         }
         catch (Exception ex) { Console.WriteLine($"[ERROR] {ex.Message}"); }
 
-        await Task.Delay(10000); 
+        await Task.Delay(180000); // 3 minutes delay between checks
     }
 });
 
@@ -91,4 +91,10 @@ public class RealTimeAlert
     public double Lat { get; set; }
     public double Lng { get; set; }
     public string RelativeLocation { get; set; } = string.Empty;
+}
+
+// NEW: Add this class at the very bottom or inside the Global namespace
+public static class GlobalData
+{
+    public static RealTimeAlert? LatestAlert { get; set; }
 }
