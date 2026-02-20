@@ -2,19 +2,6 @@
   "version": 3,
   "targets": {
     "net10.0": {
-      "Microsoft.AspNetCore.Cors/2.3.9": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/_._": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/_._": {
-            "related": ".xml"
-          }
-        }
-      },
       "MySqlConnector/2.5.0": {
         "type": "package",
         "compile": {
@@ -57,19 +44,6 @@
     }
   },
   "libraries": {
-    "Microsoft.AspNetCore.Cors/2.3.9": {
-      "sha512": "p1pnw4abepxDxxyU2dJVRqUtDHIUHYo17aRY+FfpvWwoOqFg3mroe+M7sKnqKXxwbbookaLs89wKSFH4CFpKRA==",
-      "type": "package",
-      "path": "microsoft.aspnetcore.cors/2.3.9",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/netstandard2.0/Microsoft.AspNetCore.Cors.dll",
-        "lib/netstandard2.0/Microsoft.AspNetCore.Cors.xml",
-        "microsoft.aspnetcore.cors.2.3.9.nupkg.sha512",
-        "microsoft.aspnetcore.cors.nuspec"
-      ]
-    },
     "MySqlConnector/2.5.0": {
       "sha512": "hoAwfHHF8DlRRqwHOhN3u1KLi+XbX/4LPS7Anfa+SYC97vRyIfdEOEEfj1L50q01Ik8aDNvmDrNmu/VPFiAiaQ==",
       "type": "package",
@@ -153,7 +127,6 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "Microsoft.AspNetCore.Cors >= 2.3.9",
       "MySqlConnector >= 2.5.0",
       "Newtonsoft.Json >= 13.0.4",
       "Telegram.Bot >= 22.8.1"
@@ -210,10 +183,6 @@
       "net10.0": {
         "targetAlias": "net10.0",
         "dependencies": {
-          "Microsoft.AspNetCore.Cors": {
-            "target": "Package",
-            "version": "[2.3.9, )"
-          },
           "MySqlConnector": {
             "target": "Package",
             "version": "[2.5.0, )"
@@ -663,17 +632,5 @@
         }
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1510",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "PackageReference Microsoft.AspNetCore.Cors will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "libraryId": "Microsoft.AspNetCore.Cors",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    }
-  ]
+  }
 }

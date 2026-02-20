@@ -28,32 +28,39 @@ namespace HeatAlert
             if (update.Message is not { Text: not null } message) return;
 
             long chatId = message.Chat.Id;
+            string text = message.Text.ToLower();
             string username = message.From?.Username ?? "UnknownUser";
 
-            if (message.Text.ToLower() == "/subscribeservice")
+            // 1. Unified Subscription Logic (Removed the double-check you had)
+            if (text == "/subscribeservice")
             {
                 await _db.SaveSubscriber(chatId, username);
-                
-                // Updated to use the more modern SendMessage
-                await bot.SendMessage(
-                    chatId: chatId, 
-                    text: "✅ You WILL NOW RECEIVE HEAT SIGNATURE UPDATES within Talisay Heat Alerts!",
-                    cancellationToken: ct
-                );
+                await bot.SendMessage(chatId, "✅ *Subscribed\\!* You will now receive live heat alerts for Talisay City\\.", parseMode: Telegram.Bot.Types.Enums.ParseMode.MarkdownV2);
             }
-
-            // Inside HandleUpdateAsync in botAlertSender.cs
-            if (message.Text.ToLower() == "/subscribeservice")
-            {
-                await _db.SaveSubscriber(chatId, username);
-                await bot.SendMessage(chatId, "✅ Subscribed!");
-            }
-            else if (message.Text.ToLower() == "/unsubscribeservice") // NEW COMMAND
+            else if (text == "/unsubscribeservice")
             {
                 await _db.RemoveSubscriber(chatId);
-                await bot.SendMessage(chatId, "👋 You have been unsubscribed. You will no longer receive heat alerts.");
+                await bot.SendMessage(chatId, "👋 *Unsubscribed\\.* You will no longer receive heat signature updates\\.", parseMode: Telegram.Bot.Types.Enums.ParseMode.MarkdownV2);
             }
+            // 2. Enhanced Weather Check
+            else if (text == "/weather") 
+            {
+                var weatherService = new WeatherService();
+                var data = await weatherService.GetRealTimeTalisayData();
+                
+                if (data.Any())
+                {
+                    var hottest = data.OrderByDescending(w => w.Temp).First();
+                    var avgTemp = data.Average(w => w.Temp);
 
+                    string response = $"🌦️ *Talisay City Live Status*\n\n" +
+                                    $"City Average: *{avgTemp:F1}°C*\n" +
+                                    $"Hottest Area: *{hottest.Name}* \\({hottest.Temp}°C\\)\n\n" +
+                                    $"_Source: OpenWeather API_";
+
+                    await bot.SendMessage(chatId, response, parseMode: Telegram.Bot.Types.Enums.ParseMode.MarkdownV2);
+                }
+            }
         }
 
         private Task HandleErrorAsync(ITelegramBotClient bot, Exception ex, CancellationToken ct)
@@ -65,30 +72,29 @@ namespace HeatAlert
         // --- THE BROADCASTER ---
         // Instead of sending to ONE hardcoded ID, send to the whole list from DB
         // --- THE BROADCASTER ---
-// Refactored to accept a pre-formatted string instead of raw doubles
-        public async Task BroadcastAlert(string alertMsg, List<long> subscriberIds)
+        // Refactored to accept a pre-formatted string instead of raw doubles
+                // Change 'public async Task BroadcastAlert(string alertMsg, List<long> subscriberIds)'
+        // to this:
+        public async Task BroadcastAlert(string alertMsg, double lat, double lng, List<long> subscriberIds)
         {
-            // Use a counter for better console logging
             int sentCount = 0;
-
             foreach (var id in subscriberIds)
             {
                 try 
                 {
-                    // Note: Telegram.Bot v21+ uses SendMessage instead of SendTextMessageAsync
-                    await _botClient.SendMessage(
-                        chatId: id, 
-                        text: alertMsg
-                    );
+                    await _botClient.SendMessage(chatId: id, text: alertMsg, parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                    
+                    // This is the extra line that uses the 'lat' and 'lng' we added
+                    await _botClient.SendLocation(chatId: id, latitude: lat, longitude: lng);
+                    
                     sentCount++;
                 } 
                 catch (Exception ex)
                 {
-                    // Useful for debugging if a user blocked the bot
-                    Console.WriteLine($"⚠️ Could not send to {id}: {ex.Message}");
+                    Console.WriteLine($"⚠️ {id} blocked the bot: {ex.Message}");
                 }
             }
-            Console.WriteLine($"📢 Broadcast complete. Sent to {sentCount} subscribers.");
+            Console.WriteLine($"📢 Sent to {sentCount} subscribers.");
+            }
         }
-    }
 }
